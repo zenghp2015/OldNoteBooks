@@ -1,4 +1,4 @@
 module.exports = {
-  dest: 'dist',
-  title: 'Zero'
+  title: 'Zero1',
+  description: 'haha'
 }

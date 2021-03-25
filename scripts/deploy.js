@@ -3,19 +3,26 @@ const vuepress = require('vuepress')
 const compressing = require('compressing')
 const dayjs = require('dayjs')
 const { NodeSSH } = require('node-ssh')
-const dotenv = require('dotenv');
+const dotenv = require('dotenv').config();
+
+const resolve = name => Path.resolve(process.cwd(), name)
 
 
 class Deploy {
   constructor(options) {
-    this.extname = '.zip'
-    this.rootPath = process.cwd();
-    this.destPath = Path.resolve(this.rootPath, 'dist')
-    this.packageName = dayjs(new Date()).format('YYYYMMDD_HHmmss') + this.extname
-    this.packagePath = Path.resolve(this.rootPath, 'storege', this.packageName)
-    this.wwwroot = '/www/wwwroot/zhifou.info'
-    this.home = '/home/www'
-    this.env = dotenv.config().parsed
+    this.config = {
+      sourceDir: resolve('docs'),
+      dest: resolve('dist'),
+      theme: '@vuepress/theme-default',
+      siteConfig: {},
+      package: {
+        extname: '.zip',
+        name: '',
+        path: resolve('storege')
+      },
+      packagePath: resolve('storege'),
+      ...options
+    }
   }
 
   async start() {
@@ -24,22 +31,26 @@ class Deploy {
     await this.upload()
   }
 
-  async build(options){
+  async build(options) {
     const app = vuepress.createApp({
-      sourceDir: Path.resolve(this.rootPath, 'docs'),
-      dest: Path.resolve(this.rootPath, 'dist'),
-      theme: '@vuepress/theme-default',
-      siteConfig: {
-        title: 'Zero',
-        description: '哈哈'
-      }
+      sourceDir: this.config.sourceDir,
+      dest: this.config.dest,
+      theme: this.config.theme,
+      siteConfig: this.config.siteConfig
     })
+
     await app.process()
     return app.build()
   }
 
-  pack() { 
-    compressing.zip.compressDir(this.destPath, this.packagePath);
+  pack() {
+    console.log('-- 开始打包 -- ')
+    const config = this.config.package;
+    const name = config.name ? config.name : this.randomNames();
+    this.packagePath = `${config.path}/${name}${config.extname}`
+
+    compressing.zip.compressDir(this.config.dest, this.packagePath);
+    console.log('-- 打包完成 -- \n', `package: ${this.packagePath}`)
   }
 
   connect() {
@@ -53,19 +64,22 @@ class Deploy {
   }
 
   async upload() {
+    console.log('-- 开始上传 -- ')
+    const wwwroot = process.env.SERVE_WWWROOT
+    const basename = Path.basename(this.packagePath);
     const connect = await this.connect()
-    await connect.putFile(this.packagePath, this.packageName)
-    await connect.execCommand(`cp ${this.packageName} ${this.wwwroot} && cd ${this.wwwroot} && unzip -o ${this.packageName}`)
+
+    await connect.putFile(this.packagePath, basename)
+    await connect.execCommand(`unzip -o ${basename} -d ${wwwroot}`)
+    console.log('-- 上传结束 -- ')
     process.exit(0)
+  }
+  randomNames(fmt = 'YYYYMMDD_HHmmss') {
+    return dayjs(new Date()).format(fmt);
   }
 }
 
 const deploy = new Deploy({
-  sourceDir: 'docs',
-  dest: 'dist',
-  theme: '@vuepress/theme-default',
-  siteConfig: {},
-  wwwroot: '/www/wwwroot/zhifou.info',
-  home: '/home/www'
+  siteConfig: require('../docs/.vuepress/config'),
 })
 deploy.start()
