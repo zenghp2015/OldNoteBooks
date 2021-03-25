@@ -15,7 +15,6 @@
   "scripts": {
     "dev": "vuepress dev docs",
     "build": "vuepress build docs",
-    "eject": "vuepress eject docs",
     "deploy": "cross-env NODE_ENV=production node ./scripts/deploy"
   }
 }
