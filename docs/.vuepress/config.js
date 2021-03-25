@@ -1,4 +1,4 @@
 module.exports = {
   title: 'Zero',
-  description: 'haha'
+  description: '一个程序猿的VuePress'
 }

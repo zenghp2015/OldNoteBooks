@@ -3,9 +3,9 @@ const vuepress = require('vuepress')
 const compressing = require('compressing')
 const dayjs = require('dayjs')
 const { NodeSSH } = require('node-ssh')
-const dotenv = require('dotenv').config();
 
-const resolve = (...args) =>  Path.resolve(process.cwd(), ...args)
+const isProd = process.env.NODE_ENV === 'production'
+const resolve = (...args) => Path.resolve(process.cwd(), ...args)
 
 
 class Deploy {
@@ -25,8 +25,9 @@ class Deploy {
   }
 
   async start() {
-    
-    
+    const env = isProd ? '.env.prod' : '.env.default'
+    require('dotenv').config({ path: resolve(env) })
+
     await this.build({
       sourceDir: resolve(this.config.sourceDir),
       dest: resolve(this.config.dest),
