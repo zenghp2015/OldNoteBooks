@@ -48,3 +48,14 @@ $ yrm add <registry> <url>
 ## 参考
 
 - [npm/yarn设置淘宝镜像源](https://juejin.cn/post/6844903889087496200)
+
+
+---
+
+## NPM Package
+
+### 压缩和解压缩
+- [compressing](https://www.npmjs.com/package/compressing)
+
+### SSH
+- [node-ssh](https://www.npmjs.com/package/node-ssh)
