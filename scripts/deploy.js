@@ -5,52 +5,53 @@ const dayjs = require('dayjs')
 const { NodeSSH } = require('node-ssh')
 const dotenv = require('dotenv').config();
 
-const resolve = name => Path.resolve(process.cwd(), name)
+const resolve = (...args) =>  Path.resolve(process.cwd(), ...args)
 
 
 class Deploy {
-  constructor(options) {
+  constructor(options = {}) {
     this.config = {
-      sourceDir: resolve('docs'),
-      dest: resolve('dist'),
+      sourceDir: 'docs',
+      dest: 'dist',
       theme: '@vuepress/theme-default',
-      siteConfig: {},
+      siteConfig: '.vuepress/config.js',
       package: {
         extname: '.zip',
         name: '',
-        path: resolve('storege')
+        path: 'storege'
       },
-      packagePath: resolve('storege'),
       ...options
     }
   }
 
   async start() {
-    await this.build()
+    
+    
+    await this.build({
+      sourceDir: resolve(this.config.sourceDir),
+      dest: resolve(this.config.dest),
+      theme: this.config.theme,
+      siteConfig: require(resolve(this.config.sourceDir, this.config.siteConfig))
+    })
     await this.pack()
     await this.upload()
   }
 
   async build(options) {
-    const app = vuepress.createApp({
-      sourceDir: this.config.sourceDir,
-      dest: this.config.dest,
-      theme: this.config.theme,
-      siteConfig: this.config.siteConfig
-    })
-
+    const app = vuepress.createApp(options)
     await app.process()
     return app.build()
   }
 
   pack() {
-    console.log('-- 开始打包 -- ')
+    console.log('> 开始打包... ')
     const config = this.config.package;
     const name = config.name ? config.name : this.randomNames();
-    this.packagePath = `${config.path}/${name}${config.extname}`
+    const path = resolve(config.path)
+    this.packagePath = `${path}/${name}${config.extname}`
 
     compressing.zip.compressDir(this.config.dest, this.packagePath);
-    console.log('-- 打包完成 -- \n', `package: ${this.packagePath}`)
+    console.log('> 打包完成 -- \n', `package: ${this.packagePath}`)
   }
 
   connect() {
@@ -64,14 +65,14 @@ class Deploy {
   }
 
   async upload() {
-    console.log('-- 开始上传 -- ')
+    console.log('> 开始部署... ')
     const wwwroot = process.env.SERVE_WWWROOT
     const basename = Path.basename(this.packagePath);
     const connect = await this.connect()
 
     await connect.putFile(this.packagePath, basename)
     await connect.execCommand(`unzip -o ${basename} -d ${wwwroot}`)
-    console.log('-- 上传结束 -- ')
+    console.log('> 部署结束')
     process.exit(0)
   }
   randomNames(fmt = 'YYYYMMDD_HHmmss') {
@@ -79,7 +80,5 @@ class Deploy {
   }
 }
 
-const deploy = new Deploy({
-  siteConfig: require('../docs/.vuepress/config'),
-})
+const deploy = new Deploy()
 deploy.start()

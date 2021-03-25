@@ -1,4 +1,4 @@
 module.exports = {
-  title: 'Zero1',
+  title: 'Zero',
   description: 'haha'
 }
