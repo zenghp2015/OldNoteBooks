@@ -15,6 +15,7 @@
   "scripts": {
     "dev": "vuepress dev docs",
     "build": "vuepress build docs",
-    "deploy": "cross-env NODE_ENV=production node ./scripts/deploy"
+    "deploy": "cross-env NODE_ENV=production node ./scripts/deploy",
+    "commit": "git add . && git commit"
   }
 }
