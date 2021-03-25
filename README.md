@@ -1,5 +1,21 @@
 # Web Developer
 
+## 环境配置
+
+- `.env.default` 默认配置文件
+- `.env.prod` 生产环境配置文件
+
+```shell
+# SSH 配置
+SSH_HOST = 127.0.0.1
+SSH_USERNAME = sftp
+SSH_PASSWORD = sftp123
+SSH_PORT = 10086
+
+# 网站目录
+SERVE_WWWROOT = /home/www/wwwroot
+```
+
 
 ## npm/yarn 镜像管理
 ```shell

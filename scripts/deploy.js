@@ -1,4 +1,5 @@
 const Path = require('path')
+const Fs = require('fs')
 const vuepress = require('vuepress')
 const compressing = require('compressing')
 const dayjs = require('dayjs')
@@ -6,7 +7,6 @@ const { NodeSSH } = require('node-ssh')
 
 const isProd = process.env.NODE_ENV === 'production'
 const resolve = (...args) => Path.resolve(process.cwd(), ...args)
-
 
 class Deploy {
   constructor(options = {}) {
@@ -25,9 +25,7 @@ class Deploy {
   }
 
   async start() {
-    const env = isProd ? '.env.prod' : '.env.default'
-    require('dotenv').config({ path: resolve(env) })
-
+    await this.loadConfig();
     await this.build({
       sourceDir: resolve(this.config.sourceDir),
       dest: resolve(this.config.dest),
@@ -36,6 +34,13 @@ class Deploy {
     })
     await this.pack()
     await this.upload()
+  }
+
+  loadConfig() {
+    const env = isProd ? '.env.prod' : '.env.default'
+    if (Fs.existsSync(envPath)) {
+      require('dotenv').config({ path: resolve(env) })
+    }
   }
 
   async build(options) {
