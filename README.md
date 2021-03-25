@@ -4,6 +4,7 @@
 
 - `.env.default` 默认配置文件
 - `.env.prod` 生产环境配置文件
+- `.env.dev` 测试环境配置文件
 
 ```shell
 # SSH 配置
