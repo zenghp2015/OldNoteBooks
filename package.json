@@ -1,0 +1,10 @@
+{
+  "name": "notebooks",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Zero2015 <79316040+Zero2015@users.noreply.github.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "vuepress": "^1.8.2"
+  }
+}
