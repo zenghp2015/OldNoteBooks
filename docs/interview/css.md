@@ -1,3 +1,7 @@
+---
+sidebar: auto
+---
+
 # CSS 面试题
 
 ## 画 1px 高的线，不同浏览器的效果一致
@@ -196,3 +200,93 @@ width\height\padding-top\padding-bottom\margin-top\maring-bottom都不可变
 ## rgba()和 opacity 的透明效果有什么不同？
 `rgba()` 和 `opacity` 都能实现透明效果，但最大的不同是 opacity 作用于元素，以及元素内的所有内容的透明度，
 而 `rgba()` 只作用于元素的颜色或其背景色
+
+## 文字居中和水平方向重叠的方法
+
+垂直方向：`line-height`
+水平方向：`letter-spacing`
+
+## 如何垂直居中
+
+- 绝对定位
+```css
+.main {
+  width: 100px;
+  height: 100px;
+  /* 重点 */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -50px;
+  margin-top: -50px;
+}
+
+.main {
+  width: 100px;
+  height: 100px;
+  /* 重点 */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+}
+
+.main {
+  width: 100px;
+  height: 100px;
+  /* 重点 */
+  margin: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+```
+
+- flex布局
+```html
+<div id="box">
+  <div id="main"></div>
+</div>
+```
+```css
+#box {
+  display: flex;
+  /* 设置内盒垂直居中 */
+  align-items: center;
+  /* 设置内盒水平居中 */
+  justify-content: center;
+}
+#main {
+  width: 200px;
+  height: 200px;
+  background: red;
+}
+```
+
+- img 居中
+```css
+.content {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+```
+
+## BFC
+
+BFC（Block Formatting Context）格式化上下文，是 Web 页面中盒模型布局的 CSS 渲染模式，指一个独立的渲染区域或者说是一个隔离的独立容器。
+
+### 形成 BFC 的条件
+  - 浮动元素，float 除 none 以外的值
+  - 定位元素，position（absolute，fixed）
+  - display 为以下其中之一的值 inline-block，table-cell，table-caption
+  - overflow 除了 visible 以外的值（hidden，auto，scroll）
+
+### BFC 的特性
+  - 内部的 Box 会在垂直方向上一个接一个的放置。
+  - 垂直方向上的距离由 margin 决定
+  - bfc 的区域不会与 float 的元素区域重叠。
+  - 计算 bfc 的高度时，浮动元素也参与计算
+  - bfc 就是页面上的一个独立容器，容器里面的子元素不会影响外面元素。
