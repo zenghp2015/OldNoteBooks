@@ -4,6 +4,7 @@ const vuepress = require('vuepress')
 const compressing = require('compressing')
 const dayjs = require('dayjs')
 const { NodeSSH } = require('node-ssh')
+const dotenv = require('dotenv')
 
 const isProd = process.env.NODE_ENV === 'production'
 const resolve = (...args) => Path.resolve(process.cwd(), ...args)
@@ -37,10 +38,18 @@ class Deploy {
   }
 
   loadConfig() {
-    const env = isProd ? '.env.prod' : '.env.default'
-    if (Fs.existsSync(envPath)) {
-      require('dotenv').config({ path: resolve(env) })
+    // TODO 需要区分 生产环境和测试环境
+    const envPath = resolve('.env')
+    if(Fs.existsSync(envPath)) {
+      dotenv.config({ path: envPath })
     }
+    
+    // const env = isProd ? '.env.prod' : '.env.dev'
+    // const envPath = resolve(env);
+    // if (Fs.existsSync(envPath)) {
+    //   dotenv.config({ path: envPath })
+    // }
+    // console.log(process.env)
   }
 
   async build(options) {
